@@ -30,10 +30,11 @@ async def get_coin_price(coin: str, base: str = "USD") -> str:
     coin = coin.upper()
     base = base.upper()
 
-    if coin not in COINS and coin not in CRYPTO.values():
-        return f"'{coin}' is not a supported currency or crypto. Valid examples: BRL, EUR, BTC, ETH."
-    if base not in COINS:
-        return f"'{base}' is not a supported base currency. Valid examples: USD, EUR, BRL."
+    # DEVELOPMENT NOTE: For now we won't validate the coin/base against the lists, since the API seems to support a wide range of currencies. We can add validation later if needed.
+    # if coin not in COINS or coin not in CRYPTO.values():
+    #     return f"'{coin}' is not a supported currency or crypto. Valid examples: BRL, EUR, BTC, ETH."
+    # if base not in COINS or base not in CRYPTO.values():
+    #     return f"'{base}' is not a supported base currency. Valid examples: USD, EUR, BRL."
 
     data = await _request(UNIRATE_BASE_API.format(coin=coin, base=base))
     if not data:
