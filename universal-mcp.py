@@ -4,6 +4,7 @@ from mcp.server.fastmcp import FastMCP
 from weather.weather import get_forecast
 from time_mcp.time import get_current_time
 from currency.coins import get_coin_price
+from hash_encode.hash_encode import hash_text, base64_encode, base64_decode, url_encode, url_decode, detect_hash
 
 mcp = FastMCP()
 
@@ -20,6 +21,12 @@ mcp = FastMCP()
 mcp.tool()(get_forecast)
 mcp.tool()(get_current_time)
 mcp.tool()(get_coin_price)
+mcp.tool()(detect_hash)
+mcp.tool()(hash_text)
+mcp.tool()(base64_encode)
+mcp.tool()(base64_decode)
+mcp.tool()(url_encode)
+mcp.tool()(url_decode)
 
 def main():
     mcp.run()
