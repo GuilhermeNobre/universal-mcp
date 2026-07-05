@@ -9,6 +9,12 @@ This repository contains a Python MCP server built with `mcp.server.fastmcp.Fast
 Main entry point:
 
 ```text
+server.py
+```
+
+Compatibility wrapper:
+
+```text
 universal-mcp.py
 ```
 
@@ -20,6 +26,13 @@ currency/coins.py
 hash_encode/hash_encode.py
 time_mcp/time.py
 password_generator/password_generator.py
+uuid_tools/uuid_tools.py
+jwt_tools/jwt_tools.py
+text_tools/text_tools.py
+json_tools/json_tools.py
+date_tools/date_tools.py
+color_tools/color_tools.py
+qr_tools/qr_tools.py
 ```
 
 ## Install
@@ -34,18 +47,28 @@ uv sync
 
 The project requires Python `>=3.14`.
 
+## Environment Variables
+
+Currency conversion requires:
+
+```bash
+UNIRATE_API_KEY=your-api-key
+```
+
+Do not hardcode this value in source files or documentation examples with real credentials.
+
 ## Run
 
 Use this command to start the MCP server:
 
 ```bash
-uv run python universal-mcp.py
+uv run python server.py
 ```
 
 For MCP clients, prefer an absolute project path:
 
 ```bash
-uv --directory /absolute/path/to/universal-mcp run python universal-mcp.py
+uv --directory /absolute/path/to/universal-mcp run python server.py
 ```
 
 ## Claude Instructions
@@ -64,8 +87,11 @@ Example:
         "/absolute/path/to/universal-mcp",
         "run",
         "python",
-        "universal-mcp.py"
-      ]
+        "server.py"
+      ],
+      "env": {
+        "UNIRATE_API_KEY": "your-api-key"
+      }
     }
   }
 }
@@ -78,7 +104,7 @@ After updating the configuration, restart the Claude client so it can load the M
 For Codex or another coding agent with MCP support, configure a server named `universal-mcp` using the same command:
 
 ```text
-uv --directory /absolute/path/to/universal-mcp run python universal-mcp.py
+uv --directory /absolute/path/to/universal-mcp run python server.py
 ```
 
 If the client uses TOML-style MCP configuration, adapt the command and arguments like this:
@@ -91,8 +117,11 @@ args = [
   "/absolute/path/to/universal-mcp",
   "run",
   "python",
-  "universal-mcp.py"
+  "server.py"
 ]
+
+[mcp_servers.universal-mcp.env]
+UNIRATE_API_KEY = "your-api-key"
 ```
 
 Restart or reload the agent after changing its MCP configuration.
@@ -108,7 +137,9 @@ args:
   - /absolute/path/to/universal-mcp
   - run
   - python
-  - universal-mcp.py
+  - server.py
+env:
+  UNIRATE_API_KEY: your-api-key
 ```
 
 The client is responsible for keeping the server process alive while tools are being used.
@@ -117,22 +148,25 @@ The client is responsible for keeping the server process alive while tools are b
 
 - Read the existing module style before editing.
 - Add new tools as small functions with clear docstrings and typed parameters.
-- Register every new tool in `universal-mcp.py` with `mcp.tool()(tool_function)`.
+- Register every new tool in `server.py` with `mcp.tool()(tool_function)`.
+- Keep `universal-mcp.py` as a lightweight compatibility wrapper.
 - Do not save generated passwords, secrets, tokens, or user-provided sensitive values.
 - Do not print secrets to logs.
 - Keep API calls isolated in helper functions.
 - Prefer returning user-readable strings from tools.
 - Keep resource files under `.resource/` when static data is needed.
-- Run a syntax check before finishing:
+- Use environment variables for API keys and credentials.
+- Run checks before finishing:
 
 ```bash
-uv run python -m py_compile universal-mcp.py */*.py
+uv run python -m py_compile server.py universal-mcp.py */*.py
+uv run python -m unittest discover -s tests
 ```
 
 ## Security Notes
 
-- The password generator must only return the generated password to the caller.
+- The password generator must only return generated passwords to the caller.
 - Do not add persistence for generated passwords.
+- JWT decoding must not claim to validate signatures unless signature validation is actually implemented.
 - Avoid adding hardcoded secrets in new code.
-- If an API key is required for a future provider, prefer environment variables.
-
+- If an API key is required for a future provider, use environment variables.

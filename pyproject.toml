@@ -1,8 +1,9 @@
 [project]
-name = "mcp-weather"
+name = "universal-mcp"
 version = "0.1.0"
 requires-python = ">=3.14"
 dependencies = [
     "httpx>=0.28.1",
     "mcp[cli]>=1.27.1",
+    "qrcode[pil]>=8.0",
 ]
