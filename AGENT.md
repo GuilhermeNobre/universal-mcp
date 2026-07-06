@@ -33,6 +33,16 @@ json_tools/json_tools.py
 date_tools/date_tools.py
 color_tools/color_tools.py
 qr_tools/qr_tools.py
+number_tools/number_tools.py
+unit_tools/unit_tools.py
+regex_tools/regex_tools.py
+network_tools/network_tools.py
+```
+
+Shared helpers:
+
+```text
+common/http.py
 ```
 
 ## Install
@@ -152,13 +162,16 @@ The client is responsible for keeping the server process alive while tools are b
 - Keep `universal-mcp.py` as a lightweight compatibility wrapper.
 - Do not save generated passwords, secrets, tokens, or user-provided sensitive values.
 - Do not print secrets to logs.
-- Keep API calls isolated in helper functions.
+- Keep API calls isolated in helper functions. Use `common/http.py` (`fetch_json`) for HTTP GET requests that return JSON.
+- Use the `secrets` module (not `random`) for anything security-sensitive, like password generation.
 - Prefer returning user-readable strings from tools.
 - Keep resource files under `.resource/` when static data is needed.
 - Use environment variables for API keys and credentials.
 - Run checks before finishing:
 
 ```bash
+uv run ruff check .
+uv run ruff format --check .
 uv run python -m py_compile server.py universal-mcp.py */*.py
 uv run python -m unittest discover -s tests
 ```

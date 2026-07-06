@@ -9,11 +9,7 @@ def text_stats(text: str) -> str:
     """
     words = re.findall(r"\S+", text)
     lines = text.splitlines() or [text]
-    return (
-        f"Characters: {len(text)}\n"
-        f"Words: {len(words)}\n"
-        f"Lines: {len(lines)}"
-    )
+    return f"Characters: {len(text)}\nWords: {len(words)}\nLines: {len(lines)}"
 
 
 def transform_text(text: str, mode: str = "lower") -> str:

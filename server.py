@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from mcp.server.fastmcp import FastMCP
 
 from color_tools.color_tools import convert_color, generate_color_palette, validate_color
@@ -18,26 +20,34 @@ from hash_encode.hash_encode import (
 )
 from json_tools.json_tools import format_json, json_keys, minify_json, validate_json
 from jwt_tools.jwt_tools import decode_jwt
+from network_tools.network_tools import cidr_info, ip_in_cidr, validate_ip
+from number_tools.number_tools import convert_angle, convert_number_base
 from password_generator.password_generator import generate_password
 from qr_tools.qr_tools import generate_qr_code
+from regex_tools.regex_tools import test_regex
 from text_tools.text_tools import slugify_text, text_stats, transform_text
 from time_mcp.time import get_current_time
+from unit_tools.unit_tools import convert_unit
 from uuid_tools.uuid_tools import generate_uuid, validate_uuid
-from weather.weather import get_forecast
+from weather.weather import get_forecast, search_location
+
+_RESOURCE_DIR = Path(__file__).parent / ".resource"
 
 mcp = FastMCP()
 
-# @mcp.resource("currency://coins")
-# def list_coins():
-#     with open(".resource/coins.json", "r") as f:
-#         return f.read()
 
-# @mcp.resource("currency://crypto")
-# def list_crypto():
-#     with open(".resource/crypto.json", "r") as f:
-#         return f.read()
+@mcp.resource("currency://coins")
+def list_coins() -> str:
+    return (_RESOURCE_DIR / "coins.json").read_text()
+
+
+@mcp.resource("currency://crypto")
+def list_crypto() -> str:
+    return (_RESOURCE_DIR / "crypto.json").read_text()
+
 
 mcp.tool()(get_forecast)
+mcp.tool()(search_location)
 mcp.tool()(get_current_time)
 mcp.tool()(get_coin_price)
 mcp.tool()(detect_hash)
@@ -65,6 +75,13 @@ mcp.tool()(generate_qr_code)
 mcp.tool()(validate_color)
 mcp.tool()(convert_color)
 mcp.tool()(generate_color_palette)
+mcp.tool()(convert_number_base)
+mcp.tool()(convert_angle)
+mcp.tool()(convert_unit)
+mcp.tool()(test_regex)
+mcp.tool()(validate_ip)
+mcp.tool()(cidr_info)
+mcp.tool()(ip_in_cidr)
 
 
 def main():

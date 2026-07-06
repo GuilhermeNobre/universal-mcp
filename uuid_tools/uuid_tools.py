@@ -5,12 +5,14 @@ def generate_uuid(version: int = 4) -> str:
     """Generate a UUID.
 
     Args:
-        version: UUID version to generate. Currently only version 4 is supported.
+        version: UUID version to generate. Options: 4 (random) or 7 (time-ordered).
     """
-    if version != 4:
-        return "Only UUID version 4 is supported."
+    if version == 4:
+        return str(uuid.uuid4())
+    if version == 7:
+        return str(uuid.uuid7())
 
-    return str(uuid.uuid4())
+    return "Only UUID versions 4 and 7 are supported."
 
 
 def validate_uuid(value: str) -> str:

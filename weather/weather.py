@@ -1,18 +1,8 @@
-NWS_API_BASE = "https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&hourly=temperature_2m,relative_humidity_2m,rain,precipitation_probability"
-USER_AGENT = "universal-app/1.0"
+from common.http import fetch_json
 
-import httpx
-from typing import Any
+FORECAST_API = "https://api.open-meteo.com/v1/forecast?latitude={latitude}&longitude={longitude}&hourly=temperature_2m,relative_humidity_2m,rain,precipitation_probability"
+GEOCODING_API = "https://geocoding-api.open-meteo.com/v1/search?name={name}&count={count}&language=en&format=json"
 
-async def make_nws_request(url: str) -> dict[str, Any] | None:
-    headers = {"User-Agent": USER_AGENT}
-    async with httpx.AsyncClient() as client:
-        try:
-            response = await client.get(url, headers=headers, timeout=30.0)
-            response.raise_for_status()
-            return response.json()
-        except Exception:
-            return None
 
 async def get_forecast(latitude: float, longitude: float) -> str:
     """Get weather forecast for a location.
@@ -21,8 +11,8 @@ async def get_forecast(latitude: float, longitude: float) -> str:
         latitude: Latitude of the location
         longitude: Longitude of the location
     """
-    url = NWS_API_BASE.format(latitude=latitude, longitude=longitude)
-    data = await make_nws_request(url)
+    url = FORECAST_API.format(latitude=latitude, longitude=longitude)
+    data = await fetch_json(url)
 
     if not data or "hourly" not in data:
         return "Unable to fetch forecast data for this location."
@@ -47,3 +37,40 @@ async def get_forecast(latitude: float, longitude: float) -> str:
         )
 
     return "\n".join(forecasts)
+
+
+async def search_location(name: str, count: int = 5) -> str:
+    """Search a place by name and return latitude/longitude candidates.
+
+    Args:
+        name: Place name to search, like a city (e.g. Sao Paulo, Berlin).
+        count: Maximum number of results. Defaults to 5.
+    """
+    name = name.strip()
+    if not name:
+        return "Place name cannot be empty."
+    if count < 1 or count > 20:
+        return "Count must be between 1 and 20."
+
+    url = GEOCODING_API.format(name=name, count=count)
+    data = await fetch_json(url)
+
+    if data is None:
+        return "Unable to fetch location data."
+
+    results = data.get("results")
+    if not results:
+        return f"No locations found for '{name}'."
+
+    lines = []
+    for place in results:
+        parts = [place.get("name", "?")]
+        if place.get("admin1"):
+            parts.append(place["admin1"])
+        if place.get("country"):
+            parts.append(place["country"])
+        lines.append(
+            f"{', '.join(parts)}  lat: {place.get('latitude')}  lon: {place.get('longitude')}"
+        )
+
+    return "\n".join(lines)

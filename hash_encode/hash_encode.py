@@ -1,5 +1,5 @@
-import hashlib
 import base64
+import hashlib
 import re
 from urllib.parse import quote, unquote
 
@@ -7,11 +7,11 @@ SUPPORTED_ALGORITHMS = ("md5", "sha1", "sha256", "sha512")
 
 # (length, charset) → possible algorithms
 _HEX_HASH_MAP: dict[int, list[str]] = {
-    32:  ["MD5", "MD4", "NTLM"],
-    40:  ["SHA-1", "RIPEMD-160"],
-    56:  ["SHA-224", "SHA-3-224"],
-    64:  ["SHA-256", "SHA-3-256", "BLAKE2s"],
-    96:  ["SHA-384", "SHA-3-384"],
+    32: ["MD5", "MD4", "NTLM"],
+    40: ["SHA-1", "RIPEMD-160"],
+    56: ["SHA-224", "SHA-3-224"],
+    64: ["SHA-256", "SHA-3-256", "BLAKE2s"],
+    96: ["SHA-384", "SHA-3-384"],
     128: ["SHA-512", "SHA-3-512", "BLAKE2b-512"],
 }
 
@@ -72,7 +72,9 @@ def hash_text(text: str, algorithm: str = "sha256") -> str:
     """
     algorithm = algorithm.lower()
     if algorithm not in SUPPORTED_ALGORITHMS:
-        return f"Unsupported algorithm '{algorithm}'. Choose from: {', '.join(SUPPORTED_ALGORITHMS)}."
+        return (
+            f"Unsupported algorithm '{algorithm}'. Choose from: {', '.join(SUPPORTED_ALGORITHMS)}."
+        )
 
     digest = hashlib.new(algorithm, text.encode()).hexdigest()
     return f"{algorithm.upper()}({text!r}) = {digest}"

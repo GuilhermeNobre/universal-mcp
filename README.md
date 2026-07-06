@@ -7,7 +7,8 @@ Universal MCP is a Python MCP server that exposes practical utility tools for ag
 Weather and time:
 
 - `get_forecast`: Gets a 24-hour weather forecast from Open-Meteo using latitude and longitude.
-- `get_current_time`: Gets the current date and time for a UTC offset.
+- `search_location`: Searches a place by name and returns latitude/longitude candidates.
+- `get_current_time`: Gets the current date and time for a UTC offset or IANA timezone name.
 
 Currency:
 
@@ -25,7 +26,7 @@ Hashing and encoding:
 Passwords and identifiers:
 
 - `generate_password`: Generates one or more random passwords without saving them.
-- `generate_uuid`: Generates a UUID v4.
+- `generate_uuid`: Generates a UUID v4 (random) or v7 (time-ordered).
 - `validate_uuid`: Validates a UUID string.
 
 JWT, JSON, and text:
@@ -49,6 +50,24 @@ Dates, colors, and QR Codes:
 - `convert_color`: Converts HEX to RGB and HSL.
 - `generate_color_palette`: Generates a simple HEX color palette.
 - `generate_qr_code`: Generates a QR Code PNG as a Base64 data URL.
+
+Numbers and units:
+
+- `convert_number_base`: Converts a number between bases 2 to 36.
+- `convert_angle`: Converts angles between degrees, radians, gradians, and turns.
+- `convert_unit`: Converts between units of temperature, length, mass, and data size.
+
+Regex and network:
+
+- `test_regex`: Tests a regular expression against a text and lists the matches.
+- `validate_ip`: Validates an IPv4 or IPv6 address and describes it.
+- `cidr_info`: Describes a CIDR network (netmask, range, host count).
+- `ip_in_cidr`: Checks whether an IP address belongs to a CIDR network.
+
+## Available Resources
+
+- `currency://coins`: Static list of supported fiat currency codes.
+- `currency://crypto`: Static list of supported cryptocurrency codes.
 
 ## Requirements
 
@@ -143,6 +162,10 @@ Agents should read `AGENT.md` before modifying or installing the project.
 - Run checks before committing changes:
 
 ```bash
+uv run ruff check .
+uv run ruff format --check .
 uv run python -m py_compile server.py universal-mcp.py */*.py
 uv run python -m unittest discover -s tests
 ```
+
+Lint and formatting use `ruff` (installed via the `dev` dependency group with `uv sync`).

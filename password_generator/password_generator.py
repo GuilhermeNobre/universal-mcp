@@ -1,5 +1,8 @@
-import random
+import secrets
 import string
+from random import SystemRandom
+
+_rng = SystemRandom()
 
 
 def generate_password(
@@ -50,20 +53,17 @@ def generate_password(
         groups.append(uppercase)
 
     if length < len(groups):
-        return (
-            f"Password length must be at least {len(groups)} "
-            "for the selected character options."
-        )
+        return f"Password length must be at least {len(groups)} for the selected character options."
 
     characters = "".join(groups)
     passwords = []
     for _ in range(count):
-        required_chars = [random.choice(group) for group in groups]
+        required_chars = [secrets.choice(group) for group in groups]
         remaining_length = length - len(required_chars)
         password_chars = required_chars + [
-            random.choice(characters) for _ in range(remaining_length)
+            secrets.choice(characters) for _ in range(remaining_length)
         ]
-        random.shuffle(password_chars)
+        _rng.shuffle(password_chars)
         passwords.append("".join(password_chars))
 
     return "\n".join(passwords)
