@@ -1,4 +1,10 @@
+<div align="center">
+
 # Universal MCP
+
+### 💍 *One MCP to rule them all, one MCP to find them,*<br>*one MCP to bring them all, and in one server bind them.*
+
+</div>
 
 Universal MCP is a Python MCP server that exposes practical utility tools for agents and MCP-compatible clients.
 
