@@ -18,31 +18,48 @@ Compatibility wrapper:
 universal-mcp.py
 ```
 
-Tool modules:
+Tool modules live under `tools/`, grouped by category:
 
 ```text
-weather/weather.py
-currency/coins.py
-hash_encode/hash_encode.py
-time_mcp/time.py
-password_generator/password_generator.py
-uuid_tools/uuid_tools.py
-jwt_tools/jwt_tools.py
-text_tools/text_tools.py
-json_tools/json_tools.py
-date_tools/date_tools.py
-color_tools/color_tools.py
-qr_tools/qr_tools.py
-number_tools/number_tools.py
-unit_tools/unit_tools.py
-regex_tools/regex_tools.py
-network_tools/network_tools.py
+tools/
+├── external/      # tools that call external APIs
+│   ├── weather.py       # get_forecast, search_location
+│   └── currency.py      # get_coin_price
+├── security/
+│   ├── hashing.py       # detect_hash, hash_text, base64_*, url_*
+│   ├── passwords.py     # generate_password
+│   ├── jwt.py           # decode_jwt
+│   └── uuid.py          # generate_uuid, validate_uuid
+├── text/
+│   ├── text.py          # text_stats, transform_text, slugify_text
+│   ├── json.py          # validate_json, format_json, minify_json, json_keys
+│   └── regex.py         # test_regex
+├── datetime/
+│   ├── current_time.py  # get_current_time
+│   └── dates.py         # timestamps, date_difference, add_time
+├── conversion/
+│   ├── numbers.py       # convert_number_base, convert_angle
+│   ├── units.py         # convert_unit
+│   └── colors.py        # validate_color, convert_color, generate_color_palette
+├── network/
+│   └── ip.py            # validate_ip, cidr_info, ip_in_cidr
+└── media/
+    └── qr.py            # generate_qr_code
 ```
+
+Each module exports a `TOOLS` list with its tool functions. `tools/__init__.py` aggregates them into `ALL_TOOLS`, which `server.py` registers automatically.
 
 Shared helpers:
 
 ```text
 common/http.py
+```
+
+Static resource data:
+
+```text
+resources/coins.json
+resources/crypto.json
 ```
 
 ## Install
@@ -157,22 +174,22 @@ The client is responsible for keeping the server process alive while tools are b
 ## Development Rules For Agents
 
 - Read the existing module style before editing.
-- Add new tools as small functions with clear docstrings and typed parameters.
-- Register every new tool in `server.py` with `mcp.tool()(tool_function)`.
+- Add new tools as small functions with clear docstrings and typed parameters, under the matching `tools/<category>/` package.
+- Add every new tool function to the `TOOLS` list of its module. New modules must also be imported and listed in `tools/__init__.py`.
 - Keep `universal-mcp.py` as a lightweight compatibility wrapper.
 - Do not save generated passwords, secrets, tokens, or user-provided sensitive values.
 - Do not print secrets to logs.
 - Keep API calls isolated in helper functions. Use `common/http.py` (`fetch_json`) for HTTP GET requests that return JSON.
 - Use the `secrets` module (not `random`) for anything security-sensitive, like password generation.
 - Prefer returning user-readable strings from tools.
-- Keep resource files under `.resource/` when static data is needed.
+- Keep resource files under `resources/` when static data is needed.
 - Use environment variables for API keys and credentials.
 - Run checks before finishing:
 
 ```bash
 uv run ruff check .
 uv run ruff format --check .
-uv run python -m py_compile server.py universal-mcp.py */*.py
+uv run python -m compileall -q server.py universal-mcp.py common tools tests
 uv run python -m unittest discover -s tests
 ```
 

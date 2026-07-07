@@ -2,21 +2,21 @@ import re
 import unittest
 from unittest.mock import AsyncMock, patch
 
-from color_tools.color_tools import convert_color, validate_color
-from currency.coins import get_coin_price
-from date_tools.date_tools import date_to_unix_timestamp, unix_timestamp_to_date
-from json_tools.json_tools import format_json, validate_json
-from jwt_tools.jwt_tools import decode_jwt
-from network_tools.network_tools import cidr_info, ip_in_cidr, validate_ip
-from number_tools.number_tools import convert_angle, convert_number_base
-from password_generator.password_generator import generate_password
-from qr_tools.qr_tools import generate_qr_code
-from regex_tools.regex_tools import test_regex
-from text_tools.text_tools import slugify_text, text_stats, transform_text
-from time_mcp.time import get_current_time
-from unit_tools.unit_tools import convert_unit
-from uuid_tools.uuid_tools import generate_uuid, validate_uuid
-from weather.weather import get_forecast, search_location
+from tools.conversion.colors import convert_color, validate_color
+from tools.conversion.numbers import convert_angle, convert_number_base
+from tools.conversion.units import convert_unit
+from tools.datetime.current_time import get_current_time
+from tools.datetime.dates import date_to_unix_timestamp, unix_timestamp_to_date
+from tools.external.currency import get_coin_price
+from tools.external.weather import get_forecast, search_location
+from tools.media.qr import generate_qr_code
+from tools.network.ip import cidr_info, ip_in_cidr, validate_ip
+from tools.security.jwt import decode_jwt
+from tools.security.passwords import generate_password
+from tools.security.uuid import generate_uuid, validate_uuid
+from tools.text.json import format_json, validate_json
+from tools.text.regex import test_regex
+from tools.text.text import slugify_text, text_stats, transform_text
 
 
 class ToolTests(unittest.TestCase):
@@ -159,14 +159,14 @@ class HttpToolTests(unittest.IsolatedAsyncioTestCase):
             },
         }
 
-        with patch("weather.weather.fetch_json", new=AsyncMock(return_value=payload)):
+        with patch("tools.external.weather.fetch_json", new=AsyncMock(return_value=payload)):
             result = await get_forecast(-23.55, -46.63)
 
         self.assertIn("Temp: 21.5°C", result)
         self.assertIn("Precip. prob: 10%", result)
 
     async def test_get_forecast_handles_failure(self):
-        with patch("weather.weather.fetch_json", new=AsyncMock(return_value=None)):
+        with patch("tools.external.weather.fetch_json", new=AsyncMock(return_value=None)):
             result = await get_forecast(0, 0)
 
         self.assertIn("Unable to fetch forecast data", result)
@@ -184,14 +184,14 @@ class HttpToolTests(unittest.IsolatedAsyncioTestCase):
             ]
         }
 
-        with patch("weather.weather.fetch_json", new=AsyncMock(return_value=payload)):
+        with patch("tools.external.weather.fetch_json", new=AsyncMock(return_value=payload)):
             result = await search_location("Sao Paulo")
 
         self.assertIn("São Paulo, São Paulo, Brazil", result)
         self.assertIn("lat: -23.5475", result)
 
     async def test_search_location_handles_no_results(self):
-        with patch("weather.weather.fetch_json", new=AsyncMock(return_value={})):
+        with patch("tools.external.weather.fetch_json", new=AsyncMock(return_value={})):
             result = await search_location("nowhere-xyz")
 
         self.assertIn("No locations found", result)
@@ -207,7 +207,7 @@ class HttpToolTests(unittest.IsolatedAsyncioTestCase):
 
         with (
             patch.dict("os.environ", {"UNIRATE_API_KEY": "test-key"}),
-            patch("currency.coins.fetch_json", new=AsyncMock(return_value=payload)),
+            patch("tools.external.currency.fetch_json", new=AsyncMock(return_value=payload)),
         ):
             result = await get_coin_price("usd", "brl")
 

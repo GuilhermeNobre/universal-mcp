@@ -161,7 +161,8 @@ Agents should read `AGENT.md` before modifying or installing the project.
 ## Development Notes
 
 - Keep tools small and focused.
-- Register new tools in `server.py`.
+- Add new tools under `tools/<category>/` and list them in the module's `TOOLS`; `server.py` registers everything from `tools.ALL_TOOLS` automatically.
+- When creating a new module, import it in `tools/__init__.py`.
 - Do not store generated passwords, secrets, tokens, or user-provided sensitive values.
 - Prefer async HTTP helpers for tools that call external APIs.
 - Prefer environment variables for API keys.
@@ -170,7 +171,7 @@ Agents should read `AGENT.md` before modifying or installing the project.
 ```bash
 uv run ruff check .
 uv run ruff format --check .
-uv run python -m py_compile server.py universal-mcp.py */*.py
+uv run python -m compileall -q server.py universal-mcp.py common tools tests
 uv run python -m unittest discover -s tests
 ```
 
