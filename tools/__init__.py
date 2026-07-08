@@ -1,6 +1,6 @@
 from tools.conversion import colors, numbers, units
 from tools.datetime import current_time, dates
-from tools.external import currency, weather
+from tools.external import currency, urlshortener, weather
 from tools.media import qr
 from tools.network import ip
 from tools.security import hashing, jwt, passwords, uuid
@@ -10,6 +10,7 @@ _MODULES = [
     weather,
     current_time,
     currency,
+    urlshortener,
     hashing,
     passwords,
     uuid,

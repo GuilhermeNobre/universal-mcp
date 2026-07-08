@@ -8,6 +8,7 @@ from tools.conversion.units import convert_unit
 from tools.datetime.current_time import get_current_time
 from tools.datetime.dates import date_to_unix_timestamp, unix_timestamp_to_date
 from tools.external.currency import get_coin_price
+from tools.external.urlshortener import shorten_url
 from tools.external.weather import get_forecast, search_location
 from tools.media.qr import generate_qr_code
 from tools.network.ip import cidr_info, ip_in_cidr, validate_ip
@@ -195,6 +196,33 @@ class HttpToolTests(unittest.IsolatedAsyncioTestCase):
             result = await search_location("nowhere-xyz")
 
         self.assertIn("No locations found", result)
+
+    async def test_shorten_url_rejects_invalid_scheme(self):
+        result = await shorten_url("ftp://example.com")
+
+        self.assertIn("http:// or https://", result)
+
+    async def test_shorten_url_returns_tinyurl(self):
+        mock_response = AsyncMock()
+        mock_response.text = "https://tinyurl.com/abc123"
+        mock_response.raise_for_status = lambda: None
+
+        with patch("tools.external.urlshortener.httpx.AsyncClient") as mock_client:
+            mock_client.return_value.__aenter__.return_value.get = AsyncMock(
+                return_value=mock_response
+            )
+            result = await shorten_url("https://example.com/some/long/path")
+
+        self.assertEqual(result, "https://tinyurl.com/abc123")
+
+    async def test_shorten_url_handles_failure(self):
+        with patch(
+            "tools.external.urlshortener.httpx.AsyncClient",
+            side_effect=Exception("network error"),
+        ):
+            result = await shorten_url("https://example.com")
+
+        self.assertIn("Failed to shorten URL", result)
 
     async def test_get_coin_price_requires_api_key(self):
         with patch.dict("os.environ", {}, clear=True):

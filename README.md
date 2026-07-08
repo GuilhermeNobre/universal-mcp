@@ -16,9 +16,10 @@ Weather and time:
 - `search_location`: Searches a place by name and returns latitude/longitude candidates.
 - `get_current_time`: Gets the current date and time for a UTC offset or IANA timezone name.
 
-Currency:
+Currency and URLs:
 
 - `get_coin_price`: Converts a currency or cryptocurrency to another currency using UniRate.
+- `shorten_url`: Shortens a URL using TinyURL. No account or API key required.
 
 Hashing and encoding:
 
